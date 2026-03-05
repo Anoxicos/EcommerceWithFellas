@@ -10,15 +10,15 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check()) {
+        if (!auth()->check()) {
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->isAdmin()) {
+        if (!auth()->user()->isAdmin()) {
             abort(403, 'Accès refusé. Réservé aux administrateurs.');
         }
 
-        if (Auth::user()->is_suspended) {
+        if (auth()->user()->is_suspended) {
             abort(403, 'Votre compte est suspendu.');
         }
 

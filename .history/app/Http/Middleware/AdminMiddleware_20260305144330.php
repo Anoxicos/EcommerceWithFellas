@@ -14,7 +14,7 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->isAdmin()) {
+        if (!Auth::user()isAdmin()) {
             abort(403, 'Accès refusé. Réservé aux administrateurs.');
         }
 

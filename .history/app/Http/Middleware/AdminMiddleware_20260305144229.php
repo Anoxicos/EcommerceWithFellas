@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\M\Request;
+
 
 class AdminMiddleware
 {
@@ -14,7 +16,7 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->isAdmin()) {
+        if (!Auth::User::isAdmin()) {
             abort(403, 'Accès refusé. Réservé aux administrateurs.');
         }
 

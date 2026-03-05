@@ -22,7 +22,7 @@ class AdminUserController extends Controller
         ]);
 
         // Prevent demoting yourself
-        if ($user->id === Auth::id()) {
+        if ($user->id === auth()->id()) {
             return back()->with('error', 'Vous ne pouvez pas modifier votre propre rôle.');
         }
 
@@ -32,7 +32,7 @@ class AdminUserController extends Controller
 
     public function toggleSuspend(User $user)
     {
-        if ($user->id === Auth::id()) {
+        if ($user->id === auth()->id()) {
             return back()->with('error', 'Vous ne pouvez pas suspendre votre propre compte.');
         }
 

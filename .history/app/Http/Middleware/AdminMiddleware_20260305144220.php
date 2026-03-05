@@ -6,6 +6,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+
+
 class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
@@ -14,7 +16,7 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->isAdmin()) {
+        if (!Auth::User::isAdmin()) {
             abort(403, 'Accès refusé. Réservé aux administrateurs.');
         }
 

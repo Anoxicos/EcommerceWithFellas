@@ -32,7 +32,7 @@ class AdminUserController extends Controller
 
     public function toggleSuspend(User $user)
     {
-        if ($user->id === Auth::id()) {
+        if ($user->id === $user->id === Auth::id()) {
             return back()->with('error', 'Vous ne pouvez pas suspendre votre propre compte.');
         }
 

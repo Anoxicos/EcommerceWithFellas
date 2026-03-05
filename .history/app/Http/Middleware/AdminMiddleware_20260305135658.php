@@ -18,7 +18,7 @@ class AdminMiddleware
             abort(403, 'Accès refusé. Réservé aux administrateurs.');
         }
 
-        if (Auth::user()->is_suspended) {
+        if (auth()->user()->is_suspended) {
             abort(403, 'Votre compte est suspendu.');
         }
 
