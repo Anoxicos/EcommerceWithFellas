@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) 
-        { 
-                $table->bigIncrements('id'); 
-                $table->foreignId('user_id') ->constrained() ->onDelete('cascade'); // optional, ensures cleanup if user deleted 
-                $table->foreignId('product_id') ->constrained('products') ->onDelete('cascade'); 
-                $table->integer('rating'); // 1–5 
-                $table->text('comment')->nullable(); 
-                $table->boolean('approved')->default(false); // admin moderation 
-                $table->timestamps(); 
-                
+        Schema::create('reviews', function (Blueprint $table)
+        {
+                $table->bigIncrements('id');
+                $table->foreignId('user_id') ->constrained() ->onDelete('cascade'); // optional, ensures cleanup if user deleted
+                $table->foreignId('product_id') ->constrained('products') ->onDelete('cascade');
+                $table->integer('rating'); // 1–5
+                $table->text('comment')->nullable();
+                $table->boolean('approved')->default(false); // admin moderation
+                $table->timestamps();
+
+                // One review per user per product
+                $table->unique(['user_id', 'product_id']);
                 });
     }
 

@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) 
-        { 
-                $table->bigIncrements('id'); 
-                $table->foreignId('product_id') ->constrained('products') ->onDelete('cascade'); 
-                $table->string('path'); 
-                $table->boolean('is_primary')->default(false); 
-                $table->timestamps(); 
-                
+        Schema::create('product_images', function (Blueprint $table)
+        {
+                $table->id();
+                $table->foreignId('product_id') ->constrained('products') ->onDelete('cascade');
+                $table->string('path');
+                $table->timestamps();
+
                 });
     }
 
