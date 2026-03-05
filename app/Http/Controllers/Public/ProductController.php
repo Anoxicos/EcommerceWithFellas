@@ -1,62 +1,57 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
-
-class AdminCategoryController extends Controller
+use Illuminate\Support\Facades\Auth;
+class ProductController extends Controller
 {
-    public function index()
+    // Product listing with category filter
+    public function index(Request $request)
     {
-        $categories = Category::withCount('products')->latest()->paginate(15);
-        return view('admin.categories.index', compact('categories'));
-    }
+        $categories = Category::all();
+        $query      = Product::with(['category', 'images', 'reviews']);
 
-    public function create()
-    {
-        return view('admin.categories.create');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'        => 'required|string|max:255|unique:categories,name',
-            'description' => 'nullable|string|max:1000',
-        ]);
-
-        Category::create($request->only('name', 'description'));
-
-        return redirect()->route('admin.categories.index')
-                         ->with('success', 'Catégorie créée avec succès.');
-    }
-
-    public function edit(Category $category)
-    {
-        return view('admin.categories.edit', compact('category'));
-    }
-
-    public function update(Request $request, Category $category)
-    {
-        $request->validate([
-            'name'        => 'required|string|max:255|unique:categories,name,' . $category->id,
-            'description' => 'nullable|string|max:1000',
-        ]);
-
-        $category->update($request->only('name', 'description'));
-
-        return redirect()->route('admin.categories.index')
-                         ->with('success', 'Catégorie mise à jour.');
-    }
-
-    public function destroy(Category $category)
-    {
-        if ($category->products()->count() > 0) {
-            return back()->with('error', 'Impossible de supprimer : cette catégorie contient des produits.');
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
         }
 
-        $category->delete();
-        return back()->with('success', 'Catégorie supprimée.');
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->latest()->paginate(12);
+
+        return view('public.products.index', compact('products', 'categories'));
+    }
+
+    // Single product detail page
+    public function show(Product $product)
+    {
+        $product->load(['category', 'images', 'reviews.user']);
+
+        return view('public.products.show', compact('product'));
+    }
+
+    // Submit a review (authenticated users only)
+    public function review(Request $request, Product $product)
+    {
+        $request->validate([
+            'rating'  => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        $product->reviews()->updateOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'rating'  => $request->rating,
+                'comment' => $request->comment,
+            ]
+        );
+
+        return back()->with('success', 'Avis soumis avec succès !');
     }
 }

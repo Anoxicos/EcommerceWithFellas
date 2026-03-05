@@ -1,52 +1,56 @@
 @extends('layouts.app')
+@section('title', 'Admin — Produits')
 
 @section('content')
-    <h1>Products</h1>
+<div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center">
+        <h1>Gestion des Produits</h1>
+        <a href="{{ route('admin.products.create') }}">+ Nouveau produit</a>
+    </div>
 
-    <a href="{{ route('admin.products.create') }}">Add Product</a>
-
-    @if(session('success'))
-        <p style="color: green;">{{ session('success') }}</p>
-    @endif
-
-    <table border="1" cellpadding="8" cellspacing="0">
+    <table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price (MAD)</th>
+                <th>Image</th>
+                <th>Nom</th>
+                <th>Catégorie</th>
+                <th>Prix</th>
                 <th>Stock</th>
-                <th>Primary Image</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-        @forelse($products as $product)
+            @foreach($products as $product)
             <tr>
-                <td>{{ $product->name }}</td>
-                <td>{{ $product->category->name ?? '—' }}</td>
-                <td>{{ number_format($product->price, 2) }}</td>
-                <td>{{ $product->stock }}</td>
                 <td>
-                    @if($product->primaryImage)
-                        <img src="{{ asset('storage/'.$product->primaryImage->path) }}" width="80" alt="Primary Image">
+                    @if($product->images->first())
+                        <img src="{{ asset('storage/' . $product->images->first()->path) }}"
+                             width="60" height="60" style="object-fit:cover">
+                    @else
+                        —
                     @endif
                 </td>
+                <td>{{ $product->name }}</td>
+                <td>{{ $product->category->name }}</td>
+                <td>{{ number_format($product->price, 2) }} €</td>
+                <td>{{ $product->stock }}</td>
                 <td>
-                    {{-- Delete form --}}
-                    <form method="POST" action="{{ route('admin.products.destroy', $product) }}">
+                    <a href="{{ route('admin.products.edit', $product) }}">Modifier</a>
+
+                    <form method="POST"
+                          action="{{ route('admin.products.destroy', $product) }}"
+                          onsubmit="return confirm('Supprimer ce produit ?')"
+                          style="display:inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" onclick="return confirm('Delete this product?')">Delete</button>
+                        <button type="submit">Supprimer</button>
                     </form>
                 </td>
             </tr>
-        @empty
-            <tr><td colspan="6">No products found.</td></tr>
-        @endforelse
+            @endforeach
         </tbody>
     </table>
 
-    {{-- Pagination --}}
     {{ $products->links() }}
+</div>
 @endsection

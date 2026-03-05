@@ -5,20 +5,25 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AdminMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         if (!Auth::check()) {
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->isAdmin()) {
+        /** @var User $user */
+        $user = Auth::user();
+        
+        if (!$user->isAdmin()) {
             abort(403, 'Accès refusé. Réservé aux administrateurs.');
         }
 
-        if (Auth::user()->is_suspended) {
+        
+        if ($user->is_suspended) {
             abort(403, 'Votre compte est suspendu.');
         }
 
